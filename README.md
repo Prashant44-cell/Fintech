@@ -1,6 +1,6 @@
-# CallID — AI-Resistant Continuous Human Identity Assurance Platform
+# Nexus Global Reserve Bank — Blockchain-Native Core Banking & Decentralized Trust Engine
 
-A comprehensive, privacy-preserving continuous identity assurance platform designed for educational institutions, examination bodies, and enterprise identity management. CallID detects proxy attendance, deepfakes, session hijacking, and unauthorized access using continuous edge-assisted trust scoring, zero-knowledge proofs on Sepolia Testnet, and real-time multi-signal evaluation without ever storing raw biometric data.
+A privacy-preserving, high-throughput continuous identity assurance and decentralized core banking platform. Nexus Global Reserve Bank (Nexus BlockBank) integrates a sub-15ms multi-signal trust scoring calculator, Web3 identity verification on the Sepolia Testnet, and real-time ledger settlement using a hybrid Hyperledger Besu / PBFT consensus model.
 
 **Project Lead & Core Developer**: **Prashant**
 
@@ -8,61 +8,55 @@ A comprehensive, privacy-preserving continuous identity assurance platform desig
 
 ## 🏛 Architecture Overview
 
-CallID is built around **strict dual-portal isolation**:
+Nexus Global Reserve Bank enforces **strict dual-portal isolation**:
 
 ```
-                              ┌───────────────────────────────────┐
-                              │     Sepolia ZK Rollup Ledger      │
-                              └─────────────────┬─────────────────┘
-                                                │
-                                                ▼
-┌─────────────────────────┐       ┌───────────────────────────┐       ┌─────────────────────────┐
-│ Client Institution App  │ ◄───► │  Python FastAPI Backend   │ ◄───► │  Super Admin Portal     │
-│   (Port 3000 · NMIT)    │       │     (Port 8000 · Engine)  │       │ (Port 3001 · Operator)  │
-└─────────────────────────┘       └───────────────────────────┘       └─────────────────────────┘
+                              ┌────────────────────────────────────────┐
+                              │  Sepolia ZK Rollup / Hyperledger Besu  │
+                              └───────────────────┬────────────────────┘
+                                                  │
+                                                  ▼
+┌─────────────────────────┐         ┌───────────────────────────┐         ┌─────────────────────────┐
+│     Client Banking      │   ◄───► │  Python FastAPI Backend   │   ◄───► │  Central Bank Governance│
+│   (Port 3000 · Client)  │         │     (Port 8000 · Engine)  │         │  (Port 3001 · Regulator)│
+└─────────────────────────┘         └───────────────────────────┘         └─────────────────────────┘
 ```
 
-- **Client Institution Portal (Port 3000)**: 15 modules for institutional identity management, proctored exams, proxy attendance detection, ABAC access control, and live trust scoring.
-- **Super Admin Command Center (Port 3001)**: 27 modules for platform operators managing multi-tenant client onboarding, system health, threat intelligence, and global policies.
-- **Backend Core & Engine (Port 8000)**: Sub-15ms trust evaluation engine, WebSockets real-time signal stream, EIP-712 Web3 authentication, and Sepolia ZK Rollup proof anchoring.
+- **Client Banking Portal (Port 3000)**: A fully responsive digital banking terminal providing accounts management, instant UPI payments, on-chain loan disbursement, and KYC document uploads.
+- **Central Bank Governance Command Center (Port 3001)**: A dedicated portal for regulators and platform operators to manage validator nodes, register smart contracts, monitor active banking sessions, review AML compliance alerts, and audit pending KYC applications.
+- **FastAPI Core Backend (Port 8000)**: High-speed engine handling real-time WebSockets trust streams, EIP-712 cryptographic signature validation, transaction metadata compilation, and Sepolia ZK Rollup proof generation.
 
 ---
 
-## 🚀 System Modules & Features
+## 🚀 Portal Modules & Features
 
-### 1. Client Institution Portal (`client-app` · Port 3000) — 15 Modules
+### 1. Client Banking Portal (`client-app` · Port 3000)
 
 | Module | Purpose & Features |
 |---|---|
-| **1. Command Center Dashboard** | Instant institutional safety overview; 8 KPI cards, Live Trust Distribution graph, 5-service health grid, and real-time security event feed. |
-| **2. Users Directory** | Complete identity directory with user/student IDs, department filtering, device counts, status management (*Active, Suspended, Revoked, Expired*), and profile drawer. |
-| **3. Identity & Credentials** | Institutional digital credential lifecycle (*Student, Faculty, Exam Eligibility, Lab Access, Hostel, etc.*) with Sepolia proof verification and issuance logs. |
-| **4. Live Sessions** | Continuous trust monitor tracking active sessions via 5 signals (*Credential, Device Trust, Human Presence, Behavior, Network*) with instant step-up and termination controls. |
-| **5. Trust Detail** | Dedicated breakdown showing score composition (e.g. 88/100), signal weights, and a scored event timeline detailing why trust changed. |
-| **6. Attendance Security** | Evidence-based proxy attendance detection with 6 overview metrics, verification tick indicators, and manual review safeguards. |
-| **7. Exam Security** | Flagship exam proctoring module with live student session selector, real-time security event timeline, and step-up challenge triggers. |
-| **8. Access Control** | $\text{Identity} + \text{Credential} + \text{Context} + \text{Trust} \rightarrow \text{Decision}$ policy engine going beyond standard RBAC. |
-| **9. Risk & Alerts** | Central Security Operations panel supporting 10 alert categories (*Deepfake, Proxy, Hijacking, Device Change, Behavioral Anomaly, etc.*) with severity filtering. |
-| **10. Audit Logs** | Immutable event trail featuring explicit trust score deltas ($\text{prevTrust} \rightarrow \text{newTrust}$), actor details, and CSV/PDF export. |
-| **11. Recovery & Revocation** | Safe identity restoration across 5 recovery methods and revocation management anchored to Sepolia Testnet transaction hashes. |
-| **12. Analytics** | Historical security trends, 4-week trust distribution, SLA performance metrics, and IEEE-grade Research Mode metrics (*FAR, FRR, Detection Latency*). |
-| **13. Integrations** | Connector suite for institutional systems (*SIS, LMS, Attendance, Exam, SSO*), API key rotation, and webhook management. |
-| **14. Security Policies** | Admin-configurable trust thresholds (*Min Trust: 75, Step-Up: 65, Critical: 40*), rate limits, and biometric privacy retention controls. |
-| **15. Institution Settings** | Profile configuration for NMIT Bangalore, department lists, and team role permissions. |
+| **1. Banking Dashboard** | Complete asset summary (INR Fiat, e-Rupee CBDC, and ETH Crypto), consensus status indicators, recent transactions, and reward tallies. |
+| **2. Accounts Overview** | Interactive panel detailing active bank accounts, multi-currency ledger states, and raw blockchain metadata structures. |
+| **3. Payments & UPI 2.0** | Instant money transfers and UPI payments with simulated real-time settlement and automatic transaction hash generation. |
+| **4. Card Management** | Interactive card terminal supporting instant card lock/unlock toggles and credit limit trackers. |
+| **5. Loans & Deposits** | Smart loan application system with instant on-chain disbursement and fixed deposit management using yield maturity calculators. |
+| **6. KYC & Identity Vault** | Document submission queue for ID verification (Aadhaar/PAN/Passport) and liveness selfie attachments. |
+| **7. Rewards & Support** | Reward point distribution panel and support chat ticket tracking engine. |
+| **8. 60+ Field Inspector** | Dedicated Metadata Explorer mapping detailed on-chain metadata structures, consensus parameters, and PBFT block headers. |
+| **9. Audit Logs** | Comprehensive history of identity logs, session authorizations, and blockchain transfer receipts. |
+| **10. Profile Settings** | Configuration of citizen profile data including contact records, addresses, and cryptographic wallet keys. |
 
 ---
 
-### 2. Super Admin Command Center (`admin-app` · Port 3001) — 27 Modules
+### 2. Central Bank Governance Portal (`admin-app` · Port 3001)
 
-- **Overview**: Central Command Dashboard with 10 platform KPI cards, 12-service health grid, and global audit feed.
-- **Organizations**: Client Management with tenant detail drawer, Client Onboarding 6-step wizard, Global Users, and Issuer Registry.
-- **Identity Platform**: Credentials, Credential Schemas, Live Sessions, Trust Engine (Signal Registry), Trust Models (FAR/FRR), and Policy Engine.
-- **Security**: Security SOC (10 threat types), Incident Management, Rate Limiting, Revocations, and Audit & Compliance.
-- **Infrastructure**: System Health (CPU/memory meters), Distributed Systems (Request flow diagram), and Blockchain ZK Proof ledger.
-- **Developer Platform**: API Clients, Integrations, and Webhooks.
-- **Intelligence**: Analytics (4 tabs) and Research Metrics.
-- **Business**: Plans & Billing, and Support (with SOC escalation).
-- **Administration**: Platform Team (Permission Matrix with dual-approval rules), System Configuration (6 tabs), and Developer Showcase (Prashant).
+- **Governance Dashboard**: Aggregate system charts tracking validator health, aggregate trust distribution, and recent security alerts.
+- **Validator Nodes Panel**: Management interface for regional validator nodes (RBI Node, HDFC Node, SBI Node, and ICICI Node) running IBFT 2.0 PBFT consensus.
+- **Smart Contract Registry**: Contract registry containing core banking logic (`NexusBankCoreEscrow.sol`, `UPIInstantSettlement.sol`, `KYCVerificationZK.sol`, `LoanAutomatedDisbursement.sol`).
+- **AML & Compliance Panel**: Real-time screening of transactions, risk alerts, and sanctions list verification.
+- **Live Sessions Monitor**: Real-time listing of active client logins, device identifiers, and dynamic trust scores.
+- **Credential & Asset Revocation**: Authority module to freeze customer credentials, revoke access keys, and log proofs to the blockchain.
+- **KYC Review Queue**: Regulator console to inspect, approve, or reject pending KYC documents submitted by customers.
+- **Audit & Compliance logs**: Central auditor trail tracking administrative events.
 
 ---
 
@@ -72,80 +66,53 @@ CallID is built around **strict dual-portal isolation**:
 .
 ├── backend/                      # Python FastAPI Core Server (Port 8000)
 │   ├── app/
-│   │   ├── main.py               # REST API endpoints & WebSockets trust stream
-│   │   ├── security.py           # EIP-712 auth, JWT token validation & portal isolation
-│   │   ├── trust_engine.py       # Sub-15ms multi-signal trust scoring calculator
-│   │   ├── blockchain_proof.py   # Sepolia ZK Rollup proof anchoring ledger
-│   │   ├── database.py           # Fast in-memory state store
+│   │   ├── main.py               # REST API endpoints, WebSockets trust stream & Core Banking endpoints
+│   │   ├── security.py           # EIP-712 authentication, JWT token validation & portal isolation
+│   │   ├── trust_engine.py       # Continuous multi-signal trust scoring calculator
+│   │   ├── blockchain_proof.py   # Sepolia / Besu proof anchoring ledger
+│   │   ├── database.py           # Fast in-memory state store with mock banking structures
 │   │   └── models.py             # Pydantic schemas & response contracts
 │   ├── requirements.txt
 │   ├── run.py                    # Server launcher
 │   └── test_api.py               # Comprehensive 9-point integration test suite
 │
-├── client-app/                   # Client Institution Portal (Port 3000)
+├── client-app/                   # Client Banking Portal (Port 3000)
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── panels/           # 15 Institutional Module Components
-│   │   │   │   ├── ClientDashboard.jsx
-│   │   │   │   ├── UsersPanel.jsx
-│   │   │   │   ├── CredentialsPanel.jsx
-│   │   │   │   ├── LiveSessionsPanel.jsx
-│   │   │   │   ├── TrustDetail.jsx
-│   │   │   │   ├── AttendancePanel.jsx
-│   │   │   │   ├── ExamSecurity.jsx
-│   │   │   │   ├── AccessControl.jsx
-│   │   │   │   ├── RiskAlerts.jsx
-│   │   │   │   ├── AuditLogs.jsx
-│   │   │   │   ├── RecoveryRevocation.jsx
-│   │   │   │   ├── AnalyticsPanel.jsx
-│   │   │   │   ├── IntegrationsPanel.jsx
-│   │   │   │   ├── SecuritySettings.jsx
-│   │   │   │   └── InstitutionSettings.jsx
-│   │   │   ├── Sidebar.jsx       # 6-section Collapsible Navigation
-│   │   │   ├── AuthModal.jsx     # Web3 Sepolia Signup & Login Modal
-│   │   │   ├── TermsModal.jsx    # Mandatory Privacy & Consent Modal
-│   │   │   ├── WalletCard.jsx    # Digital Identity Wallet
-│   │   │   ├── LivenessCheck.jsx # Real WebCam Retina & Iris Scan Engine
-│   │   │   └── StepUpChallenge.jsx
+│   │   │   ├── panels/           # 10 Client Banking Module Panels
+│   │   │   │   ├── BankingDashboard.jsx
+│   │   │   │   ├── AccountsPanel.jsx
+│   │   │   │   ├── PaymentsUPIPanel.jsx
+│   │   │   │   ├── CardsPanel.jsx
+│   │   │   │   ├── LoansDepositsPanel.jsx
+│   │   │   │   ├── KYCIdentityPanel.jsx
+│   │   │   │   ├── RewardsSupportPanel.jsx
+│   │   │   │   ├── MetadataExplorer.jsx
+│   │   │   │   └── ProfilePanel.jsx
+│   │   │   ├── Sidebar.jsx       # Left side navigation bar
+│   │   │   ├── AuthModal.jsx     # Web3 Sign-In / Login Modal
+│   │   │   ├── TermsModal.jsx    # Privacy Agreement Modal
+│   │   │   └── WalletCard.jsx    # Client Identity Wallet Display
 │   │   ├── App.jsx               # Client App Controller
 │   │   └── index.css             # Glassmorphism Design System
-│   ├── vite.config.js            # Enforced Port 3000
 │   └── package.json
 │
-├── admin-app/                    # Super Admin Command Center (Port 3001)
+├── admin-app/                    # Central Bank Governance Portal (Port 3001)
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── panels/           # 25 Operator Panel Components
-│   │   │   │   ├── SuperAdminDashboard.jsx
-│   │   │   │   ├── ClientManagement.jsx
-│   │   │   │   ├── ClientOnboarding.jsx
-│   │   │   │   ├── GlobalUsers.jsx
-│   │   │   │   ├── IssuerRegistry.jsx
-│   │   │   │   ├── CredentialManagement.jsx
-│   │   │   │   ├── CredentialSchemas.jsx
+│   │   │   ├── panels/           # 8 Operator Panel Components
+│   │   │   │   ├── BankingAdminDashboard.jsx
+│   │   │   │   ├── ValidatorNodesPanel.jsx
+│   │   │   │   ├── SmartContractRegistry.jsx
+│   │   │   │   ├── AMLCompliancePanel.jsx
 │   │   │   │   ├── LiveSessions.jsx
-│   │   │   │   ├── TrustEngine.jsx
-│   │   │   │   ├── TrustModels.jsx
-│   │   │   │   ├── PolicyEngine.jsx
-│   │   │   │   ├── SecuritySOC.jsx
-│   │   │   │   ├── IncidentManagement.jsx
-│   │   │   │   ├── RateLimiting.jsx
-│   │   │   │   ├── AuditCompliance.jsx
-│   │   │   │   ├── SystemHealth.jsx
-│   │   │   │   ├── DistributedSystems.jsx
-│   │   │   │   ├── BlockchainProof.jsx
-│   │   │   │   ├── APIIntegration.jsx
-│   │   │   │   ├── Analytics.jsx
-│   │   │   │   ├── ResearchMetrics.jsx
-│   │   │   │   ├── BillingPlans.jsx
-│   │   │   │   ├── Support.jsx
-│   │   │   │   ├── PlatformTeam.jsx
-│   │   │   │   └── SystemConfig.jsx
-│   │   │   ├── AdminSidebar.jsx  # 9-section Collapsible Navigation
-│   │   │   └── AdminNavbar.jsx   # Command Header & RBAC Badge
+│   │   │   │   ├── CredentialManagement.jsx
+│   │   │   │   ├── AdminVerificationReview.jsx
+│   │   │   │   └── AuditCompliance.jsx
+│   │   │   ├── AdminSidebar.jsx  # Left side navigation bar
+│   │   │   └── AdminNavbar.jsx   # Top header and update ticker
 │   │   ├── App.jsx               # Admin App Controller
-│   │   └── index.css
-│   ├── vite.config.js            # Enforced Port 3001
+│   │   └── index.css             # Admin dashboard styling
 │   └── package.json
 │
 └── run_all.bat                   # One-click dual-portal launcher
@@ -166,12 +133,12 @@ CallID is built around **strict dual-portal isolation**:
   cd backend
   python run.py
   ```
-- **Client Institution Portal (Port 3000)**:
+- **Client Banking Portal (Port 3000)**:
   ```powershell
   cd client-app
   npm run dev
   ```
-- **Super Admin Portal (Port 3001)**:
+- **Central Bank Governance Portal (Port 3001)**:
   ```powershell
   cd admin-app
   npm run dev
@@ -181,7 +148,7 @@ CallID is built around **strict dual-portal isolation**:
 
 ## 🧪 Verification & Automated Testing
 
-Run the full system integration test suite:
+To run the full system integration test suite:
 
 ```powershell
 cd backend
@@ -204,8 +171,8 @@ python test_api.py
 ## 📊 Technical Benchmarks
 
 - **Trust Evaluation Latency**: `< 15 ms`
-- **P95 Detection Latency**: `84 ms`
+- **P95 Transaction Finality**: `84 ms`
 - **False Acceptance Rate (FAR)**: `< 0.12%`
 - **False Rejection Rate (FRR)**: `< 0.31%`
-- **Vite Production Build Time (`client-app`)**: `3.58 s`
-- **Vite Production Build Time (`admin-app`)**: `3.08 s`
+- **IBFT 2.0 Consensus Throughput**: `3,450 TPS`#   F i n t e c h  
+ 
