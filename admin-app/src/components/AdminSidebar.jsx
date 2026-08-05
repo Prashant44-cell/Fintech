@@ -1,143 +1,93 @@
 import React, { useState } from 'react';
 import {
-  LayoutDashboard, Building2, UserPlus, Users, Key,
-  CreditCard, FileCode2, Monitor, Brain, GitBranch,
-  ShieldAlert, AlertOctagon, Gauge, Ban, FileText,
-  Server, Cpu, Network, Link2, Package,
-  Code2, Plug, Webhook,
-  BarChart2, FlaskConical, Layers,
-  Receipt, MessageSquare,
-  UserCog, Lock, Bell, Settings,
-  ChevronLeft, ChevronRight, ChevronDown, ChevronUp,
-  Sparkles
+  LayoutDashboard, Server, Code, ShieldAlert, FileText,
+  CreditCard, Monitor, ChevronLeft, ChevronRight, ChevronDown, ChevronUp,
+  Landmark, LogOut, TrendingUp
 } from 'lucide-react';
 
 const SECTIONS = [
   {
-    id: 'overview', label: 'Overview',
+    id: 'overview', label: 'Command Center',
+    items: [{ id: 'dashboard', label: 'Regulatory Dashboard', icon: LayoutDashboard }]
+  },
+  {
+    id: 'network', label: 'Blockchain Infrastructure',
     items: [
-      { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+      { id: 'validators', label: 'Validator Nodes', icon: Server },
+      { id: 'contracts', label: 'Smart Contracts IDE', icon: Code }
     ]
   },
   {
-    id: 'organizations', label: 'Organizations',
+    id: 'compliance', label: 'Security & AML',
     items: [
-      { id: 'clients', label: 'Clients', icon: Building2 },
-      { id: 'onboarding', label: 'Client Onboarding', icon: UserPlus },
-      { id: 'users', label: 'Users & Admins', icon: Users },
-      { id: 'issuers', label: 'Issuers', icon: Key },
+      { id: 'aml', label: 'AML & Sanction Screening', icon: ShieldAlert }
     ]
   },
   {
-    id: 'identity', label: 'Identity Platform',
+    id: 'platform', label: 'Platform Management',
     items: [
-      { id: 'credentials', label: 'Credentials', icon: CreditCard },
-      { id: 'schemas', label: 'Credential Schemas', icon: FileCode2 },
-      { id: 'sessions', label: 'Live Sessions', icon: Monitor },
-      { id: 'trustengine', label: 'Trust Engine', icon: Brain },
-      { id: 'trustmodels', label: 'Trust Models', icon: Layers },
-      { id: 'policy', label: 'Policy Engine', icon: GitBranch },
+      { id: 'credentials', label: 'Customer Assets Directory', icon: CreditCard },
+      { id: 'verifications', label: 'Identity Review Queue', icon: ShieldAlert },
+      { id: 'sessions', label: 'Live Banking Sessions', icon: Monitor },
+      { id: 'audit', label: 'Regulatory Audit Ledger', icon: FileText }
     ]
-  },
-  {
-    id: 'security', label: 'Security',
-    items: [
-      { id: 'soc', label: 'Security Operations', icon: ShieldAlert, badge: '7', badgeColor: '#ef4444' },
-      { id: 'incidents', label: 'Incidents', icon: AlertOctagon, badge: '3', badgeColor: '#f59e0b' },
-      { id: 'ratelimiting', label: 'Rate Limiting', icon: Gauge },
-      { id: 'revocation', label: 'Revocations', icon: Ban },
-      { id: 'audit', label: 'Audit & Compliance', icon: FileText },
-    ]
-  },
-  {
-    id: 'infrastructure', label: 'Infrastructure',
-    items: [
-      { id: 'systemhealth', label: 'System Health', icon: Server },
-      { id: 'distributed', label: 'Distributed Systems', icon: Network },
-      { id: 'blockchain', label: 'Blockchain / Proof', icon: Link2 },
-    ]
-  },
-  {
-    id: 'developer', label: 'Developer Platform',
-    items: [
-      { id: 'api', label: 'API Clients', icon: Code2 },
-      { id: 'integrations', label: 'Integrations', icon: Plug },
-      { id: 'webhooks', label: 'Webhooks', icon: Webhook },
-    ]
-  },
-  {
-    id: 'intelligence', label: 'Intelligence',
-    items: [
-      { id: 'analytics', label: 'Analytics', icon: BarChart2 },
-      { id: 'research', label: 'Research Metrics', icon: FlaskConical },
-    ]
-  },
-  {
-    id: 'business', label: 'Business',
-    items: [
-      { id: 'billing', label: 'Plans & Billing', icon: Receipt },
-      { id: 'support', label: 'Support', icon: MessageSquare },
-    ]
-  },
-  {
-    id: 'administration', label: 'Administration',
-    items: [
-      { id: 'team', label: 'Platform Team', icon: UserCog },
-      { id: 'config', label: 'System Configuration', icon: Settings },
-      { id: 'developer-showcase', label: 'Developer Showcase', icon: Sparkles },
-    ]
-  },
+  }
 ];
 
-export default function AdminSidebar({ activeTab, setActiveTab, isCollapsed, setIsCollapsed }) {
+export default function AdminSidebar({ activeTab, setActiveTab, isCollapsed, setIsCollapsed, admin, onLogout }) {
   const [collapsedSections, setCollapsedSections] = useState({});
 
   const toggleSection = (id) => {
     setCollapsedSections(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
+  const name = admin?.credential?.full_name || 'Regulatory Governor';
+  const initials = name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+
   return (
     <aside style={{
-      width: isCollapsed ? '72px' : '260px',
+      width: isCollapsed ? '72px' : '248px',
       height: '100vh',
       position: 'fixed',
-      top: 0,
-      left: 0,
-      background: 'rgba(8, 12, 22, 0.98)',
-      backdropFilter: 'blur(20px)',
-      borderRight: '1px solid rgba(255, 255, 255, 0.08)',
+      top: 0, left: 0,
+      background: '#ffffff',
+      borderRight: '1px solid #e8ecf0',
       zIndex: 900,
       display: 'flex',
       flexDirection: 'column',
-      transition: 'width 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-      boxShadow: '4px 0 32px rgba(0,0,0,0.7)',
-      overflowX: 'hidden'
+      transition: 'width 0.28s cubic-bezier(0.16, 1, 0.3, 1)',
+      boxShadow: '2px 0 12px rgba(0,0,0,0.06)',
+      overflowX: 'hidden',
+      overflowY: 'auto',
     }}>
-      {/* Logo Header */}
+
+      {/* ── Logo Header ── */}
       <div style={{
         padding: isCollapsed ? '1.1rem 0' : '1.1rem 1.1rem',
-        display: 'flex',
-        alignItems: 'center',
+        display: 'flex', alignItems: 'center',
         justifyContent: isCollapsed ? 'center' : 'space-between',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.07)',
-        flexShrink: 0
+        borderBottom: '1px solid #f0f2f5',
+        flexShrink: 0, minHeight: 68,
       }}>
         {!isCollapsed && (
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
             <div style={{
-              width: 34, height: 34, borderRadius: 10,
-              background: 'linear-gradient(135deg, #ef4444 0%, #8b5cf6 100%)',
+              width: 36, height: 36, borderRadius: 10,
+              background: 'linear-gradient(135deg, #6d28d9, #1a9975)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 0 15px rgba(239, 68, 68, 0.4)', flexShrink: 0
+              boxShadow: '0 2px 8px rgba(109,40,217,0.3)', flexShrink: 0
             }}>
-              <ShieldAlert size={18} color="#ffffff" />
+              <Landmark size={18} color="#fff" />
             </div>
             <div>
-              <span style={{ fontWeight: 800, fontSize: '0.95rem', color: '#ffffff', letterSpacing: '-0.02em', display: 'block' }}>
-                SUPER<span style={{ color: '#ef4444' }}>ADMIN</span>
+              <span style={{
+                fontWeight: 800, fontSize: '0.88rem', color: '#1a2332',
+                letterSpacing: '-0.02em', display: 'block', lineHeight: 1.2
+              }}>
+                Regulatory <span style={{ color: '#6d28d9' }}>Node</span>
               </span>
-              <span style={{ fontSize: '0.6rem', color: '#475569', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                CallID Platform · Port 3001
+              <span style={{ fontSize: '0.56rem', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                Reserve Bank Governor · Port 3001
               </span>
             </div>
           </div>
@@ -145,129 +95,152 @@ export default function AdminSidebar({ activeTab, setActiveTab, isCollapsed, set
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
           style={{
-            background: 'rgba(255,255,255,0.05)',
-            border: '1px solid rgba(255,255,255,0.09)',
-            borderRadius: '8px',
-            color: '#64748b',
-            padding: '0.4rem',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexShrink: 0
+            background: '#f3f4f6', border: '1px solid #e8ecf0',
+            borderRadius: 7, color: '#9ca3af',
+            padding: '0.35rem', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', flexShrink: 0,
           }}
         >
-          {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+          {isCollapsed ? <ChevronRight size={15} /> : <ChevronLeft size={15} />}
         </button>
       </div>
 
-      {/* Navigation */}
-      <nav style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: isCollapsed ? '0.5rem 0' : '0.5rem 0.6rem', display: 'flex', flexDirection: 'column', gap: 0 }}>
-        {SECTIONS.map((section) => {
+      {/* ── Navigation ── */}
+      <nav style={{
+        flex: 1, overflowY: 'auto', overflowX: 'hidden',
+        padding: isCollapsed ? '0.5rem 0.4rem' : '0.5rem 0.65rem',
+        display: 'flex', flexDirection: 'column',
+      }}>
+        {SECTIONS.map(section => {
           const isSectionCollapsed = collapsedSections[section.id];
           return (
-            <div key={section.id} style={{ marginBottom: '0.15rem' }}>
-              {/* Section Label */}
+            <div key={section.id} style={{ marginBottom: '0.2rem' }}>
               {!isCollapsed && (
                 <button
                   onClick={() => toggleSection(section.id)}
                   style={{
-                    width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                    padding: '0.45rem 0.6rem', background: 'none', border: 'none', cursor: 'pointer',
-                    marginTop: '0.6rem'
+                    width: '100%', display: 'flex', alignItems: 'center',
+                    justifyContent: 'space-between', padding: '0.45rem 0.55rem',
+                    background: 'none', border: 'none', cursor: 'pointer', marginTop: '0.6rem',
                   }}
                 >
-                  <span style={{ fontSize: '0.62rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                  <span style={{ fontSize: '0.59rem', fontWeight: 700, color: '#c4c9d4', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
                     {section.label}
                   </span>
-                  {isSectionCollapsed ? <ChevronDown size={12} color="#334155" /> : <ChevronUp size={12} color="#334155" />}
+                  {isSectionCollapsed
+                    ? <ChevronDown size={11} color="#c4c9d4" />
+                    : <ChevronUp size={11} color="#c4c9d4" />}
                 </button>
               )}
-              {isCollapsed && section.items.length > 0 && <div style={{ height: '0.4rem' }} />}
+              {isCollapsed && <div style={{ height: '0.3rem' }} />}
 
-              {/* Section Items */}
-              {!isSectionCollapsed && section.items.map((item) => {
-                const Icon = item.icon;
-                const isActive = activeTab === item.id;
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => setActiveTab(item.id)}
-                    title={isCollapsed ? item.label : undefined}
-                    style={{
-                      width: '100%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.7rem',
-                      padding: isCollapsed ? '0.65rem 0' : '0.55rem 0.7rem',
-                      justifyContent: isCollapsed ? 'center' : 'flex-start',
-                      borderRadius: '10px',
-                      border: 'none',
-                      background: isActive
-                        ? 'linear-gradient(135deg, rgba(239, 68, 68, 0.18) 0%, rgba(139, 92, 246, 0.12) 100%)'
-                        : 'transparent',
-                      color: isActive ? '#f87171' : '#64748b',
-                      boxShadow: isActive ? 'inset 0 0 0 1px rgba(239, 68, 68, 0.3)' : 'none',
-                      cursor: 'pointer',
-                      textAlign: 'left',
-                      marginBottom: '0.05rem',
-                      transition: 'all 0.18s ease',
-                    }}
-                    onMouseEnter={e => { if (!isActive) { e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; e.currentTarget.style.color = '#94a3b8'; } }}
-                    onMouseLeave={e => { if (!isActive) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#64748b'; } }}
-                  >
-                    <Icon size={17} style={{ flexShrink: 0 }} color={isActive ? '#ef4444' : undefined} />
-                    {!isCollapsed && (
-                      <>
-                        <span style={{ fontSize: '0.83rem', fontWeight: isActive ? 700 : 500, flex: 1 }}>
-                          {item.label}
-                        </span>
-                        {item.badge && (
+              {!isSectionCollapsed && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
+                  {section.items.map(item => {
+                    const Icon = item.icon;
+                    const isActive = activeTab === item.id;
+                    return (
+                      <button
+                        key={item.id}
+                        onClick={() => setActiveTab(item.id)}
+                        title={isCollapsed ? item.label : undefined}
+                        style={{
+                          display: 'flex', alignItems: 'center',
+                          gap: isCollapsed ? 0 : '0.6rem',
+                          justifyContent: isCollapsed ? 'center' : 'flex-start',
+                          padding: isCollapsed ? '0.65rem 0' : '0.5rem 0.75rem',
+                          borderRadius: 8, border: 'none',
+                          background: isActive ? 'rgba(109,40,217,0.08)' : 'transparent',
+                          color: isActive ? '#6d28d9' : '#6b7280',
+                          cursor: 'pointer', fontWeight: isActive ? 600 : 400,
+                          fontSize: '0.82rem', width: '100%', textAlign: 'left',
+                          position: 'relative',
+                          transition: 'all 0.14s ease',
+                        }}
+                      >
+                        {isActive && !isCollapsed && (
                           <span style={{
-                            fontSize: '0.6rem', fontWeight: 800, padding: '0.12rem 0.42rem',
-                            borderRadius: 9999, background: `${item.badgeColor}25`,
-                            color: item.badgeColor, border: `1px solid ${item.badgeColor}55`,
-                            minWidth: 20, textAlign: 'center'
-                          }}>
-                            {item.badge}
-                          </span>
+                            position: 'absolute', left: 0, top: '20%', bottom: '20%',
+                            width: 3, background: '#6d28d9', borderRadius: '0 3px 3px 0',
+                          }} />
                         )}
-                      </>
-                    )}
-                    {isCollapsed && item.badge && (
-                      <span style={{
-                        position: 'absolute', top: 2, right: 2, width: 14, height: 14,
-                        borderRadius: '50%', background: item.badgeColor,
-                        fontSize: '0.55rem', fontWeight: 800, color: '#fff',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center'
-                      }}>
-                        {item.badge}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
+                        <Icon size={17} color={isActive ? '#6d28d9' : '#9ca3af'} style={{ flexShrink: 0 }} />
+                        {!isCollapsed && <span>{item.label}</span>}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           );
         })}
       </nav>
 
-      {/* Footer */}
+      {/* ── Promo Banner ── */}
       {!isCollapsed && (
         <div style={{
-          padding: '0.85rem 1.1rem',
-          borderTop: '1px solid rgba(255, 255, 255, 0.06)',
-          background: 'rgba(0, 0, 0, 0.3)',
-          fontSize: '0.72rem',
-          color: '#334155',
-          flexShrink: 0
+          margin: '0.75rem',
+          background: 'linear-gradient(135deg, #6d28d9 0%, #4c1d95 100%)',
+          borderRadius: 12, padding: '1rem',
+          color: '#fff', position: 'relative', overflow: 'hidden', flexShrink: 0,
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#8b5cf6', fontWeight: 700, marginBottom: '0.15rem' }}>
-            <Lock size={11} /> SUPER ADMIN TOKEN ACTIVE
+          <div style={{ position: 'absolute', bottom: -16, right: -16, width: 64, height: 64, borderRadius: '50%', background: 'rgba(255,255,255,0.1)' }} />
+          <div style={{ fontSize: '0.7rem', fontWeight: 700, marginBottom: '0.25rem', opacity: 0.85 }}>
+            Regulatory Console
           </div>
-          <div>Platform v1.0 · Sepolia ZK Rollup</div>
+          <div style={{ fontSize: '0.8rem', fontWeight: 700, lineHeight: 1.3, marginBottom: '0.5rem' }}>
+            PBFT Consensus → Live Governance
+          </div>
+          <div style={{ fontSize: '0.7rem', opacity: 0.75, display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+            <TrendingUp size={12} /> 12 validator nodes →
+          </div>
         </div>
       )}
+
+      {/* ── Admin User Footer ── */}
+      <div style={{
+        padding: '0.85rem',
+        borderTop: '1px solid #f0f2f5',
+        background: '#fafbfc',
+        display: 'flex', alignItems: 'center',
+        justifyContent: isCollapsed ? 'center' : 'space-between',
+        gap: '0.6rem', flexShrink: 0,
+      }}>
+        {!isCollapsed && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', overflow: 'hidden' }}>
+            <div style={{
+              width: 32, height: 32, borderRadius: '50%',
+              background: 'rgba(109,40,217,0.1)',
+              border: '2px solid rgba(109,40,217,0.25)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: '#6d28d9', fontWeight: 700, fontSize: '0.72rem', flexShrink: 0,
+            }}>
+              {initials}
+            </div>
+            <div style={{ overflow: 'hidden' }}>
+              <div style={{ fontSize: '0.78rem', fontWeight: 600, color: '#1a2332', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+                {name}
+              </div>
+              <div style={{ fontSize: '0.62rem', color: '#6d28d9', fontWeight: 500 }}>
+                Reserve Bank Governor
+              </div>
+            </div>
+          </div>
+        )}
+        {onLogout && (
+          <button
+            onClick={onLogout}
+            title="Sign Out"
+            style={{
+              background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)',
+              color: '#ef4444', borderRadius: 8, padding: '0.45rem',
+              cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center',
+            }}
+          >
+            <LogOut size={15} />
+          </button>
+        )}
+      </div>
     </aside>
   );
 }

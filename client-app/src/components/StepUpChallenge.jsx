@@ -1,43 +1,46 @@
 import React, { useState } from 'react';
-import { AlertTriangle, CheckCircle2, XCircle, ArrowRight } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, XCircle } from 'lucide-react';
+import { api } from '../api';
 
 export default function StepUpChallenge({ sessionId, onChallengeResolved }) {
   const [challengeType] = useState('liveness_blink');
   const [isVerifying, setIsVerifying] = useState(false);
   const [resultMsg, setResultMsg] = useState(null);
+  const [failed, setFailed] = useState(false);
 
-  const handlePerformChallenge = async (simulatePass = true) => {
+  const handlePerformChallenge = async (pass) => {
+    if (!sessionId) {
+      setFailed(true);
+      setResultMsg('No active session to verify against.');
+      return;
+    }
     setIsVerifying(true);
     setResultMsg(null);
 
     try {
-      const res = await fetch('/api/auth/step-up', {
+      // The outcome comes from the backend, never from the caller's intent. A challenge that
+      // resolves itself when the network drops is not a challenge.
+      const data = await api('/auth/step-up', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          session_id: sessionId || 'SES-DEMO-001',
+          session_id: sessionId,
           challenge_type: challengeType,
-          challenge_response: simulatePass ? 'SUCCESS' : 'FAILED',
+          challenge_response: pass ? 'SUCCESS' : 'FAILED',
           device_sig: 'DEV-ATTESTED-01'
         })
       });
-
-      const data = await res.json();
+      setFailed(data.status !== 'success');
       setResultMsg(data.message);
-      if (simulatePass) {
-        onChallengeResolved(true);
-      } else {
-        onChallengeResolved(false);
-      }
+      onChallengeResolved({
+        trust_score: data.trust_score,
+        risk_level: data.status === 'success' ? 'low' : 'high',
+        recommended_action: data.recommended_action,
+        reasons: [data.status === 'success' ? 'STEP_UP_CHALLENGE_PASSED' : 'STEP_UP_CHALLENGE_FAILED'],
+        latency_ms: 0
+      });
     } catch (err) {
-      console.error(err);
-      if (simulatePass) {
-        setResultMsg('Step-up verification passed. Trust score restored to 92%.');
-        onChallengeResolved(true);
-      } else {
-        setResultMsg('Challenge failed. Session locked down.');
-        onChallengeResolved(false);
-      }
+      setFailed(true);
+      setResultMsg(`Verification could not be completed — ${err.message}`);
     } finally {
       setIsVerifying(false);
     }
@@ -57,10 +60,10 @@ export default function StepUpChallenge({ sessionId, onChallengeResolved }) {
 
       <div style={{ background: 'rgba(0,0,0,0.4)', padding: '1rem', borderRadius: '10px', marginBottom: '1.25rem' }}>
         <div style={{ fontSize: '0.85rem', fontWeight: '600', color: '#ffffff', marginBottom: '0.35rem' }}>
-          CHALLENGE INSTRUCTION: Blink Twice & Turn Head Slightly Right
+          CHALLENGE INSTRUCTION: Authenticate with Safe OTP/SMS Code
         </div>
         <span style={{ fontSize: '0.775rem', color: 'var(--text-muted)' }}>
-          This active challenge verifies live human responsiveness against pre-recorded synthetic deepfakes.
+          This active challenge verifies user session ownership via SMS security verification.
         </span>
       </div>
 
@@ -70,8 +73,8 @@ export default function StepUpChallenge({ sessionId, onChallengeResolved }) {
           borderRadius: '8px',
           marginBottom: '1rem',
           fontSize: '0.85rem',
-          background: resultMsg.includes('passed') ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
-          color: resultMsg.includes('passed') ? '#34d399' : '#f87171'
+          background: failed ? 'rgba(239, 68, 68, 0.15)' : 'rgba(16, 185, 129, 0.15)',
+          color: failed ? '#f87171' : '#34d399'
         }}>
           {resultMsg}
         </div>

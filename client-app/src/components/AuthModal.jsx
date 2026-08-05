@@ -1,368 +1,222 @@
 import React, { useState } from 'react';
-import { ShieldCheck, Wallet, Lock, UserPlus, LogIn, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { ShieldCheck, ArrowRight, UserPlus, LogIn, Landmark, Eye, EyeOff } from 'lucide-react';
+import { api, setToken } from '../api';
+
+const fieldStyle = {
+  width: '100%',
+  background: 'var(--bg-page)',
+  border: '1.5px solid var(--border)',
+  padding: '0.65rem 0.85rem',
+  borderRadius: 8,
+  color: 'var(--text-main)',
+  fontSize: '0.875rem',
+  outline: 'none',
+  transition: 'border-color 0.18s ease, box-shadow 0.18s ease',
+  fontFamily: 'Inter, sans-serif',
+};
 
 export default function AuthModal({ onAuthSuccess }) {
-  const [mode, setMode] = useState('login'); // 'login' or 'signup'
-  const [walletAddress, setWalletAddress] = useState('0x71C7656EC7ab88b098defB751B7401B5f6d8976F');
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
-  const [userRole, setUserRole] = useState('student');
-  const [isLoading, setIsLoading] = useState(false);
+  const [mode, setMode] = useState('login');
+  const [showPassword, setShowPassword] = useState(false);
+  const [form, setForm] = useState({
+    username: 'aarav_sharma', password: 'password123',
+    full_name: '', email: '', institution: 'Nexus Global Reserve Bank', department: 'Private Wealth & Digital Vault',
+  });
+  const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
 
-  const handleConnectWallet = () => {
-    // Generate random Web3 wallet address
-    const mockAddresses = [
-      '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
-      '0x3892a01F9b82E88902A3C1d8218049182390184b',
-      '0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed'
-    ];
-    const selected = mockAddresses[Math.floor(Math.random() * mockAddresses.length)];
-    setWalletAddress(selected);
-  };
+  const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
 
-  const handleSubmit = async (e) => {
+  const submit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
+    setBusy(true);
     setError('');
-
     try {
-      if (mode === 'signup') {
-        const nameToUse = fullName || 'Aarav Sharma';
-        const emailToUse = email || 'aarav@iitb.ac.in';
-
-        const res = await fetch('/api/auth/signup', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            wallet_address: walletAddress,
-            full_name: nameToUse,
-            email: emailToUse,
-            user_role: userRole,
-            institution: 'IIT Bombay - CS & Cybersecurity',
-            department: 'Computer Science'
-          })
-        });
-
-        const data = await res.json();
-        if (res.ok) {
-          onAuthSuccess(data);
-          return;
-        } else {
-          console.warn('Signup response notice:', data.detail);
-        }
-      }
-
-      // Login Flow with Auto-Signup Fallback
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          wallet_address: walletAddress,
-          signature: '0xSIGNATURE_EIP712_MOCK_PROOF',
-          nonce: 'NONCE_881920'
-        })
-      });
-
-      const data = await res.json();
-      if (res.ok) {
-        onAuthSuccess(data);
-      } else {
-        // Auto-register wallet identity if account doesn't exist yet
-        const signupRes = await fetch('/api/auth/signup', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            wallet_address: walletAddress,
-            full_name: fullName || 'Aarav Sharma',
-            email: email || 'aarav@iitb.ac.in',
-            user_role: userRole,
-            institution: 'IIT Bombay - CS & Cybersecurity',
-            department: 'Computer Science'
-          })
-        });
-
-        const signupData = await signupRes.json();
-        if (signupRes.ok) {
-          onAuthSuccess(signupData);
-        } else {
-          // Fallback session
-          onAuthSuccess({
-            status: 'success',
-            user_id: 'stu001',
-            credential: {
-              credential_id: 'CRED-STU-88492',
-              full_name: fullName || 'Aarav Sharma',
-              user_role: userRole,
-              institution: 'IIT Bombay - CS Dept',
-              consent_hash: '0x948aef2049182390184bceda01239841'
-            },
-            id_token: 'MOCK_JWT_ID_TOKEN'
-          });
-        }
-      }
+      const path = mode === 'login' ? '/auth/user-login' : '/auth/user-signup';
+      const body = mode === 'login'
+        ? { username: form.username, password: form.password }
+        : { ...form, user_role: 'customer' };
+      const data = await api(path, { method: 'POST', body: JSON.stringify(body) });
+      setToken(data.id_token);
+      onAuthSuccess(data);
     } catch (err) {
-      console.error('Auth connection fallback:', err);
-      onAuthSuccess({
-        status: 'success',
-        user_id: 'stu001',
-        credential: {
-          credential_id: 'CRED-STU-88492',
-          full_name: fullName || 'Aarav Sharma',
-          user_role: userRole,
-          institution: 'IIT Bombay - CS Dept',
-          consent_hash: '0x948aef2049182390184bceda01239841'
-        },
-        id_token: 'MOCK_JWT_ID_TOKEN'
-      });
+      setError(err.message);
     } finally {
-      setIsLoading(false);
+      setBusy(false);
     }
   };
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content" style={{ maxWidth: '520px' }}>
+    <div style={{
+      position: 'fixed', inset: 0, zIndex: 9999,
+      background: 'rgba(20,30,48,0.55)',
+      backdropFilter: 'blur(8px)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      padding: '1rem',
+    }}>
+      <div style={{
+        background: 'var(--bg-card)',
+        borderRadius: 20,
+        padding: '2.25rem',
+        width: '100%', maxWidth: 440,
+        boxShadow: 'var(--shadow-lg)',
+        border: '1px solid var(--border)',
+        animation: 'modalSlideUp 0.28s cubic-bezier(0.16,1,0.3,1)',
+      }}>
+        {/* Logo + title */}
         <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
           <div style={{
-            display: 'inline-flex',
-            padding: '0.85rem',
-            background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%)',
-            borderRadius: '16px',
-            marginBottom: '1rem',
-            border: '1px solid rgba(6, 182, 212, 0.35)'
+            display: 'inline-flex', padding: '0.85rem',
+            background: 'rgba(26,153,117,0.1)',
+            borderRadius: 16, marginBottom: '0.85rem',
+            border: '1px solid rgba(26,153,117,0.2)'
           }}>
-            <ShieldCheck size={36} color="#06b6d4" />
+            <Landmark size={30} color="#1a9975" />
           </div>
-          <h2 style={{ fontSize: '1.5rem', color: '#ffffff' }}>
-            {mode === 'login' ? 'Sepolia Web3 Portal Login' : 'Create Verifiable Identity Wallet'}
+          <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
+            {mode === 'login' ? 'Welcome to Nexus BlockBank' : 'Create Your Account'}
           </h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.825rem', marginTop: '0.25rem' }}>
-            Blockchain-Based Zero-Knowledge Identity Rollup
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.82rem', marginTop: '0.3rem' }}>
+            Hyperledger Besu · ZK-KYC · EIP-712 Secured
           </p>
         </div>
 
-        {/* Tab Toggle */}
+        {/* Mode toggle */}
         <div style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          background: 'rgba(0, 0, 0, 0.4)',
-          borderRadius: '10px',
-          padding: '0.25rem',
-          marginBottom: '1.25rem',
-          border: '1px solid var(--border-color)'
+          display: 'grid', gridTemplateColumns: '1fr 1fr',
+          background: 'var(--bg-page)', borderRadius: 10,
+          padding: '0.2rem', marginBottom: '1.25rem',
         }}>
-          <button
-            onClick={() => { setMode('login'); setError(''); }}
-            style={{
-              padding: '0.55rem',
-              border: 'none',
-              borderRadius: '8px',
-              background: mode === 'login' ? 'rgba(6, 182, 212, 0.2)' : 'transparent',
-              color: mode === 'login' ? '#06b6d4' : 'var(--text-muted)',
-              fontWeight: mode === 'login' ? '700' : '500',
-              cursor: 'pointer',
-              fontSize: '0.85rem',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '0.35rem'
-            }}
-          >
-            <LogIn size={15} /> Web3 Login
-          </button>
-
-          <button
-            onClick={() => { setMode('signup'); setError(''); }}
-            style={{
-              padding: '0.55rem',
-              border: 'none',
-              borderRadius: '8px',
-              background: mode === 'signup' ? 'rgba(6, 182, 212, 0.2)' : 'transparent',
-              color: mode === 'signup' ? '#06b6d4' : 'var(--text-muted)',
-              fontWeight: mode === 'signup' ? '700' : '500',
-              cursor: 'pointer',
-              fontSize: '0.85rem',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '0.35rem'
-            }}
-          >
-            <UserPlus size={15} /> Signup / Register
-          </button>
+          {[['login', 'Sign In', LogIn], ['signup', 'Register', UserPlus]].map(([m, label, Icon]) => (
+            <button
+              key={m}
+              type="button"
+              onClick={() => { setMode(m); setError(''); }}
+              style={{
+                padding: '0.55rem', border: 'none', borderRadius: 8,
+                cursor: 'pointer', fontSize: '0.85rem',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem',
+                background: mode === m ? 'var(--bg-card)' : 'transparent',
+                color: mode === m ? '#1a9975' : 'var(--text-muted)',
+                fontWeight: mode === m ? 700 : 500,
+                boxShadow: mode === m ? '0 1px 4px rgba(0,0,0,0.08)' : 'none',
+                transition: 'all 0.18s ease',
+              }}
+            >
+              <Icon size={14} /> {label}
+            </button>
+          ))}
         </div>
 
+        {/* Error */}
         {error && (
           <div style={{
-            background: 'rgba(239, 68, 68, 0.15)',
-            border: '1px solid rgba(239, 68, 68, 0.3)',
-            color: '#f87171',
-            padding: '0.65rem 0.85rem',
-            borderRadius: '8px',
-            marginBottom: '1rem',
-            fontSize: '0.825rem'
+            background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)',
+            color: '#dc2626', padding: '0.65rem 0.85rem', borderRadius: 8,
+            marginBottom: '1rem', fontSize: '0.82rem'
           }}>
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          {mode === 'signup' && (
-            <>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.775rem', color: 'var(--text-muted)', marginBottom: '0.35rem' }}>
-                  USERNAME (UNIQUE IDENTITY LOGON)
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. aarav_sharma"
-                  value={fullName ? fullName.toLowerCase().replace(/\s+/g, '_') : ''}
-                  onChange={(e) => setFullName(e.target.value)}
-                  required
-                  style={{
-                    width: '100%',
-                    background: 'rgba(0,0,0,0.5)',
-                    border: '1px solid var(--border-color)',
-                    padding: '0.65rem',
-                    borderRadius: '8px',
-                    color: '#ffffff',
-                    fontSize: '0.85rem'
-                  }}
-                />
-              </div>
+        {/* Form */}
+        <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+          <Labelled label="Username">
+            <input
+              style={fieldStyle}
+              value={form.username}
+              onChange={set('username')}
+              required
+              autoComplete="username"
+              onFocus={e => { e.target.style.borderColor = '#1a9975'; e.target.style.boxShadow = '0 0 0 3px rgba(26,153,117,0.12)'; }}
+              onBlur={e => { e.target.style.borderColor = 'var(--border)'; e.target.style.boxShadow = 'none'; }}
+            />
+          </Labelled>
 
-              <div>
-                <label style={{ display: 'block', fontSize: '0.775rem', color: 'var(--text-muted)', marginBottom: '0.35rem' }}>
-                  PASSWORD (SECURE HASHING ENFORCED)
-                </label>
-                <input
-                  type="password"
-                  placeholder="••••••••••••"
-                  defaultValue="password123"
-                  required
-                  style={{
-                    width: '100%',
-                    background: 'rgba(0,0,0,0.5)',
-                    border: '1px solid var(--border-color)',
-                    padding: '0.65rem',
-                    borderRadius: '8px',
-                    color: '#ffffff',
-                    fontSize: '0.85rem'
-                  }}
-                />
-              </div>
-
-              <div>
-                <label style={{ display: 'block', fontSize: '0.775rem', color: 'var(--text-muted)', marginBottom: '0.35rem' }}>
-                  INSTITUTIONAL EMAIL
-                </label>
-                <input
-                  type="email"
-                  placeholder="aarav@iitb.ac.in"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  style={{
-                    width: '100%',
-                    background: 'rgba(0,0,0,0.5)',
-                    border: '1px solid var(--border-color)',
-                    padding: '0.65rem',
-                    borderRadius: '8px',
-                    color: '#ffffff',
-                    fontSize: '0.85rem'
-                  }}
-                />
-              </div>
-
-              <div style={{
-                background: 'rgba(6, 182, 212, 0.1)',
-                border: '1px solid rgba(6, 182, 212, 0.3)',
-                padding: '0.75rem',
-                borderRadius: '10px',
-                fontSize: '0.8rem',
-                color: '#38bdf8'
-              }}>
-                <div style={{ fontWeight: '700', marginBottom: '0.25rem' }}>👁️ OPTIONAL RETINA BIOMETRIC ENROLLMENT</div>
-                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                  A unique profile key <code style={{ color: '#06b6d4' }}>USR-KEY-SHA256</code> will be deterministically assigned upon enrollment. Zero raw images stored on server.
-                </p>
-              </div>
-            </>
-          )}
-
-          {mode === 'login' && (
-            <div>
-              <label style={{ display: 'block', fontSize: '0.775rem', color: 'var(--text-muted)', marginBottom: '0.35rem' }}>
-                USERNAME OR EMAIL
-              </label>
+          <Labelled label="Password">
+            <div style={{ position: 'relative' }}>
               <input
-                type="text"
-                placeholder="aarav_sharma or aarav@iitb.ac.in"
-                defaultValue="aarav_sharma"
-                style={{
-                  width: '100%',
-                  background: 'rgba(0,0,0,0.5)',
-                  border: '1px solid var(--border-color)',
-                  padding: '0.65rem',
-                  borderRadius: '8px',
-                  color: '#ffffff',
-                  fontSize: '0.85rem',
-                  marginBottom: '0.75rem'
-                }}
-              />
-            </div>
-          )}
-
-          <div>
-            <label style={{ display: 'block', fontSize: '0.775rem', color: 'var(--text-muted)', marginBottom: '0.35rem' }}>
-              ETHEREUM / SEPOLIA WALLET ADDRESS (OPTIONAL WEB3)
-            </label>
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
-              <input
-                type="text"
-                value={walletAddress}
-                onChange={(e) => setWalletAddress(e.target.value)}
+                style={{ ...fieldStyle, paddingRight: '2.5rem' }}
+                type={showPassword ? 'text' : 'password'}
+                value={form.password}
+                onChange={set('password')}
                 required
-                className="mono-font"
-                style={{
-                  flex: 1,
-                  background: 'rgba(0,0,0,0.5)',
-                  border: '1px solid var(--border-color)',
-                  padding: '0.65rem',
-                  borderRadius: '8px',
-                  color: '#06b6d4',
-                  fontSize: '0.825rem'
-                }}
+                autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+                minLength={8}
+                onFocus={e => { e.target.style.borderColor = '#1a9975'; e.target.style.boxShadow = '0 0 0 3px rgba(26,153,117,0.12)'; }}
+                onBlur={e => { e.target.style.borderColor = 'var(--border)'; e.target.style.boxShadow = 'none'; }}
               />
               <button
                 type="button"
-                onClick={handleConnectWallet}
-                className="btn btn-secondary"
-                style={{ padding: '0.65rem', fontSize: '0.8rem' }}
-                title="Switch Address"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)',
+                  background: 'none', border: 'none', color: '#9ca3af', cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0
+                }}
               >
-                <Wallet size={16} />
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
-          </div>
+          </Labelled>
+
+          {mode === 'signup' && (
+            <>
+              <Labelled label="Full Name">
+                <input style={fieldStyle} value={form.full_name} onChange={set('full_name')} required
+                  onFocus={e => { e.target.style.borderColor = '#1a9975'; e.target.style.boxShadow = '0 0 0 3px rgba(26,153,117,0.12)'; }}
+                  onBlur={e => { e.target.style.borderColor = 'var(--border)'; e.target.style.boxShadow = 'none'; }} />
+              </Labelled>
+              <Labelled label="Institutional Email">
+                <input style={fieldStyle} type="email" value={form.email} onChange={set('email')} required
+                  onFocus={e => { e.target.style.borderColor = '#1a9975'; e.target.style.boxShadow = '0 0 0 3px rgba(26,153,117,0.12)'; }}
+                  onBlur={e => { e.target.style.borderColor = 'var(--border)'; e.target.style.boxShadow = 'none'; }} />
+              </Labelled>
+              <Labelled label="Department">
+                <input style={fieldStyle} value={form.department} onChange={set('department')} required
+                  onFocus={e => { e.target.style.borderColor = '#1a9975'; e.target.style.boxShadow = '0 0 0 3px rgba(26,153,117,0.12)'; }}
+                  onBlur={e => { e.target.style.borderColor = 'var(--border)'; e.target.style.boxShadow = 'none'; }} />
+              </Labelled>
+            </>
+          )}
 
           <button
             type="submit"
-            disabled={isLoading}
-            className="btn btn-primary"
-            style={{ width: '100%', justifyContent: 'center', marginTop: '0.5rem' }}
+            disabled={busy}
+            style={{
+              width: '100%', padding: '0.75rem',
+              background: busy ? '#9ca3af' : '#1a9975',
+              color: '#fff', border: 'none', borderRadius: 10,
+              fontWeight: 700, fontSize: '0.9rem', cursor: busy ? 'not-allowed' : 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+              boxShadow: busy ? 'none' : '0 4px 14px rgba(26,153,117,0.3)',
+              transition: 'all 0.18s ease',
+              marginTop: '0.2rem',
+            }}
           >
-            {isLoading ? (
-              'Verifying Sepolia Proof...'
-            ) : mode === 'login' ? (
-              <>Sign Web3 Challenge & Login <ArrowRight size={16} /></>
-            ) : (
-              <>Register Unique Profile Key & Issue Wallet <CheckCircle2 size={16} /></>
-            )}
+            {busy ? 'Verifying…' : <>{mode === 'login' ? 'Sign In' : 'Create Account'} <ArrowRight size={16} /></>}
           </button>
         </form>
+
+        <p style={{ textAlign: 'center', fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '1rem' }}>
+          Protected by ZK-Proof Biometric Authentication · EIP-712 Signed Sessions
+        </p>
       </div>
     </div>
+  );
+}
+
+function Labelled({ label, children }) {
+  return (
+    <label style={{ display: 'block' }}>
+      <span style={{
+        display: 'block', fontSize: '0.72rem', color: 'var(--text-secondary)',
+        marginBottom: '0.3rem', fontWeight: 600,
+        textTransform: 'uppercase', letterSpacing: '0.05em'
+      }}>
+        {label}
+      </span>
+      {children}
+    </label>
   );
 }

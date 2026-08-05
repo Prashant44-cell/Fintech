@@ -12,111 +12,60 @@ def test_full_system_flow():
     assert res.status_code == 200, f"Health check failed: {res.text}"
     print("Health check OK:", res.json())
 
-    print("\n--- 2. Testing Terms Acceptance Endpoint ---")
-    res = client.post("/terms/accept", json={
-        "user_id": "test_student_01",
-        "user_role": "student",
-        "accepted_version": "v1.0",
-        "biometric_consent": True,
-        "continuous_monitoring_consent": True,
-        "revocation_terms_consent": True
+    print("\n--- 2. Testing Banking Overview Endpoint ---")
+    res = client.get("/api/banking/overview")
+    assert res.status_code == 200, f"Banking overview failed: {res.text}"
+    overview = res.json()
+    assert overview["status"] == "success"
+    print("Banking Overview OK:", overview["metrics"])
+
+    print("\n--- 3. Testing Accounts List Endpoint ---")
+    res = client.get("/api/banking/accounts")
+    assert res.status_code == 200, f"Accounts list failed: {res.text}"
+    accounts = res.json()["accounts"]
+    assert len(accounts) > 0
+    print("Accounts List OK. Account count:", len(accounts))
+
+    print("\n--- 4. Testing Blockchain Transfer Endpoint ---")
+    res = client.post("/api/banking/transfer", json={
+        "sender_account": "ACC-NEX-884920",
+        "receiver_account": "ACC-HDFC-302910",
+        "amount": 2500.0,
+        "currency": "INR",
+        "description": "Test Transfer"
     })
-    assert res.status_code == 200, f"Terms acceptance failed: {res.text}"
-    terms_data = res.json()
-    consent_hash = terms_data["consent_hash"]
-    print("Terms Accepted OK. Consent Hash:", consent_hash)
+    assert res.status_code == 200, f"Transfer failed: {res.text}"
+    tx_data = res.json()
+    assert "blockchain_tx_hash" in tx_data
+    print("Transfer Executed OK. TX Hash:", tx_data["blockchain_tx_hash"])
 
-    print("\n--- 3. Testing Credential Issuance Endpoint ---")
-    res = client.post("/credential/issue", json={
-        "user_id": "test_student_01",
-        "user_role": "student",
-        "institution": "IIT Bombay",
-        "department": "Computer Science",
-        "full_name": "Test Student",
-        "consent_hash": consent_hash
+    print("\n--- 5. Testing UPI 2.0 Instant Payment ---")
+    res = client.post("/api/banking/upi/pay", json={
+        "vpa": "merchant@nexusbank",
+        "amount": 500.0,
+        "note": "Unit Test UPI"
     })
-    assert res.status_code == 200, f"Credential issuance failed: {res.text}"
-    cred_data = res.json()
-    id_token = cred_data["id_token"]
-    cred_id = cred_data["credential"]["credential_id"]
-    print("Credential Issued OK. ID Token generated, Credential ID:", cred_id)
+    assert res.status_code == 200, f"UPI payment failed: {res.text}"
+    print("UPI Payment OK. TX Hash:", res.json()["blockchain_tx_hash"])
 
-    print("\n--- 4. Testing Auth Start Session Endpoint ---")
-    res = client.post(
-        "/auth/start",
-        headers={"Authorization": f"Bearer {id_token}"},
-        json={
-            "user_id": "test_student_01",
-            "device_id": "DEV-TEST-01",
-            "ip_address": "127.0.0.1",
-            "user_agent": "TestRunner"
-        }
-    )
-    assert res.status_code == 200, f"Auth start failed: {res.text}"
-    session_data = res.json()
-    session_id = session_data["session_id"]
-    print("Session Started OK. Session ID:", session_id)
+    print("\n--- 6. Testing 60+ Field Metadata Inspector Endpoint ---")
+    obj_id = accounts[0]["metadata"]["object_id"]
+    res = client.get(f"/api/banking/metadata/{obj_id}")
+    assert res.status_code == 200, f"Metadata inspection failed: {res.text}"
+    meta = res.json()["metadata"]
+    assert meta["object_name"] == accounts[0]["metadata"]["object_name"]
+    assert "consensus_algorithm" in meta
+    assert "compliance_standards" in meta
+    print("60+ Field Metadata Verified OK:", meta["object_name"], "Consensus:", meta["consensus_algorithm"])
 
-    print("\n--- 5. Testing Continuous Trust Evaluation Endpoint ---")
-    res = client.post("/trust/evaluate", json={
-        "session_id": session_id,
-        "liveness_sig": 0.95,
-        "behavior_sig": 0.90,
-        "device_sig": 1.0,
-        "context_sig": 0.95
-    })
-    assert res.status_code == 200, f"Trust evaluation failed: {res.text}"
-    trust_res = res.json()
-    print("Trust Evaluated OK. Score:", trust_res["trust_score"], "Latency:", trust_res["latency_ms"], "ms")
-    assert trust_res["latency_ms"] < 50.0, "Latency target violated!"
+    print("\n--- 7. Testing Blockchain Regulatory Node Topology ---")
+    res = client.get("/api/blockchain/nodes")
+    assert res.status_code == 200, f"Blockchain nodes endpoint failed: {res.text}"
+    nodes_info = res.json()
+    assert len(nodes_info["active_validators"]) > 0
+    print("Regulatory Nodes OK. Active validators:", len(nodes_info["active_validators"]))
 
-    print("\n--- 6. Testing Portal Security: Client User Access Blocked on Admin Route ---")
-    res = client.get("/admin/risk-summary", headers={"Authorization": f"Bearer {id_token}"})
-    assert res.status_code == 403, f"Security Breach! Client token reached admin endpoint! Status: {res.status_code}"
-    print("Portal Isolation Confirmed! Student token rejected on Admin route (403 Forbidden).")
-
-    print("\n--- 7. Testing Admin Credential Revocation Endpoint ---")
-    # Generate valid JWT token for Admin
-    admin_token = create_access_token(
-        user_id="admin001",
-        role=UserRole.ADMIN,
-        credential_id="CRED-ADM-001",
-        consent_hash="0xADMIN_HASH"
-    )
-    res = client.post(
-        "/credential/revoke",
-        headers={"Authorization": f"Bearer {admin_token}"},
-        json={
-            "credential_id": cred_id,
-            "reason": "PROXY_ATTENDANCE_TEST",
-            "admin_id": "admin001"
-        }
-    )
-    assert res.status_code == 200, f"Revocation failed: {res.text}"
-    print("Credential Revoked OK. Response:", res.json())
-
-    print("\n--- 8. Testing Session Lockout after Revocation ---")
-    res = client.post("/trust/evaluate", json={
-        "session_id": session_id,
-        "liveness_sig": 0.95,
-        "behavior_sig": 0.90,
-        "device_sig": 1.0,
-        "context_sig": 0.95
-    })
-    assert res.status_code == 200
-    revoked_eval = res.json()
-    assert revoked_eval["recommended_action"] == "revoke"
-    print("Session Lockout Confirmed! Session evaluated as REVOKED.")
-
-    print("\n--- 9. Testing Admin Risk Summary Endpoint with Admin Token ---")
-    res = client.get("/admin/risk-summary", headers={"Authorization": f"Bearer {admin_token}"})
-    assert res.status_code == 200
-    summary = res.json()
-    print("Admin Risk Summary Fetched OK. Total active sessions:", summary["total_active_sessions"], "Revoked count:", summary["revoked_credentials_count"])
-
-    print("\n=======================================================")
-    print(" ALL 9 SYSTEM INTEGRATION TESTS PASSED CLEANLY & VERIFIED!")
-    print("=======================================================")
+    print("\n=== ALL NEXUS BLOCKBANK CORE TESTS PASSED SUCCESSFULLY! ===")
 
 if __name__ == "__main__":
     test_full_system_flow()

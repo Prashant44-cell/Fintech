@@ -1,58 +1,45 @@
 import React, { useState } from 'react';
 import {
-  LayoutDashboard, Users, CreditCard, Monitor, ShieldCheck,
-  GraduationCap, ClipboardList, Key,
-  ShieldAlert, FileText, RotateCcw,
-  BarChart2, FlaskConical,
-  Plug, UserCog, Lock, Settings, Building2,
+  LayoutDashboard, ShieldCheck, Wallet, CreditCard,
+  Send, Landmark, Award, Database, FileText,
   ChevronLeft, ChevronRight, ChevronDown, ChevronUp,
-  LogOut, Layers
+  LogOut, Cpu, TrendingUp, User
 } from 'lucide-react';
 
 const SECTIONS = [
   {
     id: 'overview', label: 'Overview',
-    items: [{ id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard }]
+    items: [{ id: 'dashboard', label: 'Banking Dashboard', icon: LayoutDashboard }]
   },
   {
-    id: 'identity', label: 'Identity',
+    id: 'banking', label: 'Banking & Money',
     items: [
-      { id: 'users', label: 'Users', icon: Users },
-      { id: 'credentials', label: 'Credentials', icon: CreditCard },
-      { id: 'sessions', label: 'Live Sessions', icon: Monitor },
-      { id: 'trust', label: 'Trust Details', icon: ShieldCheck },
+      { id: 'accounts', label: 'Accounts & Wallets', icon: Wallet },
+      { id: 'payments', label: 'Payments & UPI 2.0', icon: Send }
     ]
   },
   {
-    id: 'operations', label: 'Institution Operations',
+    id: 'credit', label: 'Credit & Wealth',
     items: [
-      { id: 'attendance', label: 'Attendance', icon: ClipboardList },
-      { id: 'exam', label: 'Exam Security', icon: GraduationCap },
-      { id: 'access', label: 'Access Control', icon: Key },
+      { id: 'cards', label: 'Cards & Tokenization', icon: CreditCard },
+      { id: 'loans', label: 'Loans & Staking', icon: Landmark }
     ]
   },
   {
-    id: 'security', label: 'Security',
+    id: 'security', label: 'Security & Compliance',
     items: [
-      { id: 'alerts', label: 'Risk & Alerts', icon: ShieldAlert, badge: '5', badgeColor: '#ef4444' },
-      { id: 'audit', label: 'Audit Logs', icon: FileText },
-      { id: 'recovery', label: 'Recovery & Revocation', icon: RotateCcw },
+      { id: 'kyc', label: 'ZK-KYC Vault', icon: ShieldCheck },
+      { id: 'profile', label: 'Profile & Verification', icon: User },
+      { id: 'audit', label: 'Immutable Audit Logs', icon: FileText }
     ]
   },
   {
-    id: 'intelligence', label: 'Intelligence',
+    id: 'governance', label: 'Governance & Tools',
     items: [
-      { id: 'analytics', label: 'Analytics', icon: BarChart2 },
+      { id: 'rewards', label: 'Rewards & Disputes', icon: Award },
+      { id: 'explorer', label: '60+ Field Inspector', icon: Database }
     ]
-  },
-  {
-    id: 'platform', label: 'Platform',
-    items: [
-      { id: 'integrations', label: 'Integrations', icon: Plug },
-      { id: 'security-settings', label: 'Security Policies', icon: Lock },
-      { id: 'institution', label: 'Institution Settings', icon: Building2 },
-    ]
-  },
+  }
 ];
 
 export default function Sidebar({ activeTab, setActiveTab, isCollapsed, setIsCollapsed, onLogout, userProfile }) {
@@ -62,118 +49,230 @@ export default function Sidebar({ activeTab, setActiveTab, isCollapsed, setIsCol
     setCollapsedSections(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
+  const initials = userProfile?.full_name
+    ? userProfile.full_name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
+    : 'AS';
+
   return (
     <aside style={{
-      width: isCollapsed ? '72px' : '252px',
+      width: isCollapsed ? '72px' : '240px',
       height: '100vh',
       position: 'fixed',
       top: 0, left: 0,
-      background: 'rgba(8, 14, 28, 0.97)',
-      backdropFilter: 'blur(20px)',
-      borderRight: '1px solid rgba(255, 255, 255, 0.08)',
+      background: 'var(--bg-sidebar)',
+      borderRight: '1px solid var(--border)',
       zIndex: 900,
       display: 'flex',
       flexDirection: 'column',
-      transition: 'width 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-      boxShadow: '4px 0 32px rgba(0,0,0,0.7)',
-      overflowX: 'hidden'
+      transition: 'width 0.28s cubic-bezier(0.16, 1, 0.3, 1)',
+      boxShadow: '2px 0 12px rgba(0,0,0,0.06)',
+      overflowX: 'hidden',
+      overflowY: 'auto'
     }}>
-      {/* Header */}
+
+      {/* ── Logo header ── */}
       <div style={{
-        padding: isCollapsed ? '1rem 0' : '1rem 1rem',
-        display: 'flex', alignItems: 'center',
+        padding: isCollapsed ? '1.1rem 0' : '1.1rem 1.1rem',
+        display: 'flex',
+        alignItems: 'center',
         justifyContent: isCollapsed ? 'center' : 'space-between',
-        borderBottom: '1px solid rgba(255,255,255,0.07)',
-        flexShrink: 0
+        borderBottom: '1px solid var(--border)',
+        flexShrink: 0,
+        minHeight: 68,
       }}>
         {!isCollapsed && (
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-            <div style={{ width: 34, height: 34, borderRadius: 10, background: 'linear-gradient(135deg, #06b6d4, #8b5cf6)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 14px rgba(6,182,212,0.45)', flexShrink: 0 }}>
-              <ShieldCheck size={18} color="#fff" />
+            <div style={{
+              width: 36, height: 36, borderRadius: 10,
+              background: 'linear-gradient(135deg, #1a9975, #0d7a5f)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 2px 8px rgba(26,153,117,0.35)', flexShrink: 0
+            }}>
+              <Landmark size={18} color="#fff" />
             </div>
             <div>
-              <span style={{ fontWeight: 800, fontSize: '0.92rem', color: '#fff', letterSpacing: '-0.02em', display: 'block' }}>
-                CALL<span style={{ color: '#06b6d4' }}>ID</span>
+              <span style={{
+                fontWeight: 800, fontSize: '0.9rem', color: 'var(--text-main)',
+                letterSpacing: '-0.02em', display: 'block', lineHeight: 1.2
+              }}>
+                Nexus <span style={{ color: '#1a9975' }}>BlockBank</span>
               </span>
-              <span style={{ fontSize: '0.58rem', color: '#475569', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                Institution Portal · Port 3000
+              <span style={{ fontSize: '0.56rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                Hyperledger Besu · Port 3000
               </span>
             </div>
           </div>
         )}
-        <button onClick={() => setIsCollapsed(!isCollapsed)} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: 8, color: '#64748b', padding: '0.4rem', cursor: 'pointer', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-          {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+        <button
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          style={{
+            background: 'var(--bg-page)', border: '1px solid var(--border)',
+            borderRadius: 7, color: 'var(--text-muted)',
+            padding: '0.35rem', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', flexShrink: 0
+          }}
+        >
+          {isCollapsed ? <ChevronRight size={15} /> : <ChevronLeft size={15} />}
         </button>
       </div>
 
-      {/* Nav */}
-      <nav style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: isCollapsed ? '0.5rem 0' : '0.5rem 0.55rem', display: 'flex', flexDirection: 'column' }}>
+      {/* ── Navigation ── */}
+      <nav style={{
+        flex: 1, overflowY: 'auto', overflowX: 'hidden',
+        padding: isCollapsed ? '0.5rem 0.4rem' : '0.5rem 0.65rem',
+        display: 'flex', flexDirection: 'column'
+      }}>
         {SECTIONS.map(section => {
           const isSectionCollapsed = collapsedSections[section.id];
           return (
-            <div key={section.id} style={{ marginBottom: '0.1rem' }}>
+            <div key={section.id} style={{ marginBottom: '0.2rem' }}>
               {!isCollapsed && (
-                <button onClick={() => toggleSection(section.id)} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.4rem 0.55rem', background: 'none', border: 'none', cursor: 'pointer', marginTop: '0.55rem' }}>
-                  <span style={{ fontSize: '0.6rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{section.label}</span>
-                  {isSectionCollapsed ? <ChevronDown size={11} color="#334155" /> : <ChevronUp size={11} color="#334155" />}
+                <button
+                  onClick={() => toggleSection(section.id)}
+                  style={{
+                    width: '100%', display: 'flex', alignItems: 'center',
+                    justifyContent: 'space-between', padding: '0.45rem 0.55rem',
+                    background: 'none', border: 'none', cursor: 'pointer',
+                    marginTop: '0.6rem'
+                  }}
+                >
+                  <span style={{
+                    fontSize: '0.59rem', fontWeight: 700, color: 'var(--text-muted)',
+                    textTransform: 'uppercase', letterSpacing: '0.1em'
+                  }}>
+                    {section.label}
+                  </span>
+                  {isSectionCollapsed
+                    ? <ChevronDown size={11} color="var(--text-muted)" />
+                    : <ChevronUp size={11} color="var(--text-muted)" />
+                  }
                 </button>
               )}
-              {isCollapsed && <div style={{ height: '0.35rem' }} />}
+              {isCollapsed && <div style={{ height: '0.3rem' }} />}
 
-              {!isSectionCollapsed && section.items.map(item => {
-                const Icon = item.icon;
-                const isActive = activeTab === item.id;
-                return (
-                  <button key={item.id} onClick={() => setActiveTab(item.id)} title={isCollapsed ? item.label : undefined} style={{
-                    width: '100%', display: 'flex', alignItems: 'center',
-                    gap: '0.65rem', padding: isCollapsed ? '0.6rem 0' : '0.52rem 0.65rem',
-                    justifyContent: isCollapsed ? 'center' : 'flex-start',
-                    borderRadius: 10, border: 'none',
-                    background: isActive ? 'linear-gradient(135deg,rgba(6,182,212,0.2),rgba(139,92,246,0.12))' : 'transparent',
-                    color: isActive ? '#38bdf8' : '#64748b',
-                    boxShadow: isActive ? 'inset 0 0 0 1px rgba(6,182,212,0.35)' : 'none',
-                    cursor: 'pointer', textAlign: 'left', marginBottom: '0.03rem',
-                    transition: 'all 0.18s ease',
-                  }}
-                  onMouseEnter={e => { if (!isActive) { e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; e.currentTarget.style.color = '#94a3b8'; } }}
-                  onMouseLeave={e => { if (!isActive) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#64748b'; } }}
-                  >
-                    <Icon size={16} style={{ flexShrink: 0 }} color={isActive ? '#06b6d4' : undefined} />
-                    {!isCollapsed && (
-                      <>
-                        <span style={{ fontSize: '0.82rem', fontWeight: isActive ? 700 : 500, flex: 1 }}>{item.label}</span>
-                        {item.badge && (
-                          <span style={{ fontSize: '0.6rem', fontWeight: 800, padding: '0.1rem 0.4rem', borderRadius: 9999, background: `${item.badgeColor}22`, color: item.badgeColor, border: `1px solid ${item.badgeColor}50`, minWidth: 18, textAlign: 'center' }}>
-                            {item.badge}
-                          </span>
+              {!isSectionCollapsed && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
+                  {section.items.map(item => {
+                    const Icon = item.icon;
+                    const isActive = activeTab === item.id;
+                    return (
+                      <button
+                        key={item.id}
+                        onClick={() => setActiveTab(item.id)}
+                        title={isCollapsed ? item.label : undefined}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: isCollapsed ? 0 : '0.6rem',
+                          justifyContent: isCollapsed ? 'center' : 'flex-start',
+                          padding: isCollapsed ? '0.65rem 0' : '0.5rem 0.75rem',
+                          borderRadius: 8,
+                          border: 'none',
+                          background: isActive ? 'rgba(26,153,117,0.1)' : 'transparent',
+                          color: isActive ? '#1a9975' : 'var(--text-secondary)',
+                          cursor: 'pointer',
+                          fontWeight: isActive ? 600 : 400,
+                          fontSize: '0.82rem',
+                          transition: 'all 0.14s ease',
+                          width: '100%',
+                          textAlign: 'left',
+                          position: 'relative',
+                        }}
+                      >
+                        {isActive && !isCollapsed && (
+                          <span style={{
+                            position: 'absolute', left: 0, top: '20%', bottom: '20%',
+                            width: 3, background: '#1a9975', borderRadius: '0 3px 3px 0'
+                          }} />
                         )}
-                      </>
-                    )}
-                  </button>
-                );
-              })}
+                        <Icon
+                          size={17}
+                          color={isActive ? '#1a9975' : 'var(--text-muted)'}
+                          style={{ flexShrink: 0 }}
+                        />
+                        {!isCollapsed && <span>{item.label}</span>}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           );
         })}
       </nav>
 
-      {/* Footer */}
+      {/* ── Promo Banner (Neatclever-style green card) ── */}
       {!isCollapsed && (
-        <div style={{ padding: '0.85rem 1rem', borderTop: '1px solid rgba(255,255,255,0.06)', background: 'rgba(0,0,0,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
-            <div style={{ width: 30, height: 30, borderRadius: '50%', background: 'linear-gradient(135deg,#06b6d4,#8b5cf6)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.85rem', color: '#fff' }}>
-              {userProfile?.full_name ? userProfile.full_name[0] : 'A'}
-            </div>
-            <div>
-              <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#fff', display: 'block' }}>{userProfile?.full_name || 'Admin'}</span>
-              <span style={{ fontSize: '0.65rem', color: '#10b981' }}>● Sepolia Verified</span>
-            </div>
+        <div style={{
+          margin: '0.75rem',
+          background: 'linear-gradient(135deg, #1a9975 0%, #0d6b52 100%)',
+          borderRadius: 12, padding: '1rem',
+          color: '#fff', position: 'relative', overflow: 'hidden',
+          flexShrink: 0
+        }}>
+          <div style={{
+            position: 'absolute', bottom: -16, right: -16,
+            width: 64, height: 64, borderRadius: '50%',
+            background: 'rgba(255,255,255,0.1)'
+          }} />
+          <div style={{ fontSize: '0.7rem', fontWeight: 700, marginBottom: '0.25rem', opacity: 0.85 }}>
+            Blockchain Banking
           </div>
-          <button onClick={onLogout} title="Log Out" style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0.3rem', borderRadius: 6, display: 'flex' }}>
-            <LogOut size={15} />
-          </button>
+          <div style={{ fontSize: '0.82rem', fontWeight: 700, lineHeight: 1.3, marginBottom: '0.5rem' }}>
+            Nexus Vault → CBDC Ready
+          </div>
+          <div style={{ fontSize: '0.7rem', opacity: 0.75, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+            <TrendingUp size={12} /> Explore features →
+          </div>
         </div>
       )}
+
+      {/* ── User Footer ── */}
+      <div style={{
+        padding: '0.85rem 0.85rem',
+        borderTop: '1px solid var(--border)',
+        background: 'var(--bg-page)',
+        display: 'flex', alignItems: 'center',
+        justifyContent: isCollapsed ? 'center' : 'space-between',
+        gap: '0.6rem',
+        flexShrink: 0,
+      }}>
+        {!isCollapsed && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', overflow: 'hidden' }}>
+            <div style={{
+              width: 32, height: 32, borderRadius: '50%',
+              background: 'rgba(26,153,117,0.12)',
+              border: '2px solid rgba(26,153,117,0.25)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: '#1a9975', fontWeight: 700, fontSize: '0.72rem', flexShrink: 0
+            }}>
+              {initials}
+            </div>
+            <div style={{ overflow: 'hidden' }}>
+              <div style={{
+                fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-main)',
+                whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden'
+              }}>
+                {userProfile?.full_name || 'Aarav Sharma'}
+              </div>
+              <div style={{ fontSize: '0.62rem', color: '#1a9975', fontWeight: 500 }}>
+                ZK Tier 3 Verified
+              </div>
+            </div>
+          </div>
+        )}
+        <button
+          onClick={onLogout}
+          title="Sign Out"
+          style={{
+            background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)',
+            color: '#ef4444', borderRadius: 8, padding: '0.45rem',
+            cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center'
+          }}
+        >
+          <LogOut size={15} />
+        </button>
+      </div>
     </aside>
   );
 }

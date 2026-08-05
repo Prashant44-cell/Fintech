@@ -30,9 +30,13 @@ def decode_access_token(token: str) -> Dict[str, Any]:
 def get_current_user(credentials: HTTPAuthorizationCredentials = Security(security_bearer)) -> Dict[str, Any]:
     return decode_access_token(credentials.credentials)
 
+# Roles that may enter the Super Admin portal (3001). Deliberately excludes PROCTOR and
+# ISSUER: institution staff work in the client portal (3000), and a token minted there must
+# never open the platform console.
+ADMIN_PORTAL_ROLES = [UserRole.ADMIN.value, UserRole.REGULATOR.value, UserRole.AUDITOR.value, UserRole.BRANCH_MANAGER.value]
+
 def require_admin_role(current_user: Dict[str, Any] = Depends(get_current_user)) -> Dict[str, Any]:
-    allowed_roles = [UserRole.ADMIN.value, UserRole.PROCTOR.value, UserRole.SECURITY_OFFICER.value, UserRole.ISSUER.value]
-    if current_user.get("role") not in allowed_roles:
+    if current_user.get("role") not in ADMIN_PORTAL_ROLES:
         raise HTTPException(
             status_code=403,
             detail="Forbidden: Client portal users cannot access Server/Admin portal resources."

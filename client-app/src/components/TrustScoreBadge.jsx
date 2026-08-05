@@ -1,11 +1,14 @@
 import React from 'react';
 import { ShieldCheck, Activity, Zap, AlertTriangle, AlertOctagon } from 'lucide-react';
+import { Empty } from './Shared';
 
 export default function TrustScoreBadge({ trustResult, isConnected }) {
-  const score = trustResult?.trust_score ?? 95.0;
-  const riskLevel = trustResult?.risk_level ?? 'low';
-  const latency = trustResult?.latency_ms ?? 12.4;
-  const reasons = trustResult?.reasons ?? ['HIGH_LIVENESS_CONFIRMED', 'KNOWN_ATTESTED_DEVICE'];
+  // No evaluation yet means exactly that. Defaulting to a high score would show an
+  // unverified session as trusted, which is the failure this whole system exists to prevent.
+  const score = trustResult?.trust_score;
+  const riskLevel = trustResult?.risk_level;
+  const latency = trustResult?.latency_ms;
+  const reasons = trustResult?.reasons ?? [];
 
   const getScoreColor = () => {
     if (score >= 80) return '#10b981';
@@ -37,6 +40,8 @@ export default function TrustScoreBadge({ trustResult, isConnected }) {
         </span>
       </div>
 
+      {trustResult ? (
+        <>
       <div className="score-circle" style={{ borderColor: getScoreColor() }}>
         <span className="mono-font" style={{ fontSize: '2.2rem', fontWeight: '800', color: '#ffffff' }}>
           {score}%
@@ -87,6 +92,10 @@ export default function TrustScoreBadge({ trustResult, isConnected }) {
           ))}
         </div>
       </div>
+        </>
+      ) : (
+        <Empty message="No trust evaluation yet — signals stream once the camera is running and the session websocket is connected." />
+      )}
     </div>
   );
 }

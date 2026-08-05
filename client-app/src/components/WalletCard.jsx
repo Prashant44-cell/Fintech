@@ -1,7 +1,9 @@
 import React from 'react';
-import { UserCheck, ShieldCheck, Key, Hash, Building2, UserX } from 'lucide-react';
+import { UserCheck, Key, Hash, Building2, UserX } from 'lucide-react';
 
-export default function WalletCard({ credential, consentHash, isRevoked }) {
+// Placeholders are em-dashes, never sample identities — a wallet showing a name that isn't
+// the holder's is worse than a wallet showing nothing.
+export default function WalletCard({ credential, isRevoked }) {
   return (
     <div className={`glass-panel ${isRevoked ? '' : 'glow-border'}`} style={{
       borderColor: isRevoked ? 'rgba(239,68,68,0.5)' : undefined
@@ -29,7 +31,7 @@ export default function WalletCard({ credential, consentHash, isRevoked }) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
         <div style={{ background: 'rgba(0,0,0,0.3)', padding: '0.85rem', borderRadius: '10px' }}>
           <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem', display: 'block' }}>FULL NAME</span>
-          <strong style={{ fontSize: '1.05rem', color: '#ffffff' }}>{credential?.full_name || 'Aarav Sharma'}</strong>
+          <strong style={{ fontSize: '1.05rem', color: '#ffffff' }}>{credential?.full_name || '—'}</strong>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
@@ -37,7 +39,7 @@ export default function WalletCard({ credential, consentHash, isRevoked }) {
             <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
               <Building2 size={13} /> INSTITUTION
             </span>
-            <span style={{ fontSize: '0.85rem', fontWeight: '600' }}>{credential?.institution || 'IIT Bombay'}</span>
+            <span style={{ fontSize: '0.85rem', fontWeight: '600' }}>{credential?.institution || '—'}</span>
           </div>
 
           <div style={{ background: 'rgba(0,0,0,0.3)', padding: '0.75rem', borderRadius: '10px' }}>
@@ -45,7 +47,7 @@ export default function WalletCard({ credential, consentHash, isRevoked }) {
               <Key size={13} /> ROLE
             </span>
             <span style={{ fontSize: '0.85rem', fontWeight: '600', textTransform: 'capitalize' }}>
-              {credential?.user_role || 'student'}
+              {credential?.user_role || '—'}
             </span>
           </div>
         </div>
@@ -55,7 +57,7 @@ export default function WalletCard({ credential, consentHash, isRevoked }) {
             <Hash size={13} /> CRYPTOGRAPHIC CONSENT HASH (TERMS AGREEMENT)
           </span>
           <code className="mono-font" style={{ fontSize: '0.75rem', color: '#06b6d4', wordBreak: 'break-all' }}>
-            {consentHash || credential?.consent_hash || '0x7e8b919a32c0451...'}
+            {credential?.consent_hash || '—'}
           </code>
         </div>
       </div>

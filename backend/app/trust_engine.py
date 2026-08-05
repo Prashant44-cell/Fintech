@@ -4,11 +4,10 @@ from app.models import TrustSignalPayload, RiskLevel, AuthAction, TrustEvaluatio
 
 class ContinuousTrustEngine:
     def __init__(self):
-        # Weights for trust signals
-        self.w_liveness = 0.40
-        self.w_behavior = 0.25
-        self.w_device = 0.20
-        self.w_context = 0.15
+        # Weights for trust signals (Behavior, Device, Context redistributing the 40% liveness weight)
+        self.w_behavior = 0.35
+        self.w_device = 0.35
+        self.w_context = 0.30
 
     def evaluate_signals(self, payload: TrustSignalPayload, is_revoked: bool = False) -> TrustEvaluationResult:
         start_time = time.perf_counter()
@@ -28,7 +27,6 @@ class ContinuousTrustEngine:
 
         # Weighted score calculation (0 to 100)
         raw_score = (
-            (payload.liveness_sig * self.w_liveness) +
             (payload.behavior_sig * self.w_behavior) +
             (payload.device_sig * self.w_device) +
             (payload.context_sig * self.w_context)
@@ -38,13 +36,11 @@ class ContinuousTrustEngine:
         if raw_score >= 80.0:
             risk_level = RiskLevel.LOW
             action = AuthAction.ALLOW
-            reasons.append("HIGH_LIVENESS_CONFIRMED")
+            reasons.append("HIGH_DEVICE_TRUST_CONFIRMED")
             reasons.append("KNOWN_ATTESTED_DEVICE")
         elif raw_score >= 50.0:
             risk_level = RiskLevel.MEDIUM
             action = AuthAction.STEP_UP
-            if payload.liveness_sig < 0.6:
-                reasons.append("LOW_LIVENESS_SIGNAL")
             if payload.behavior_sig < 0.6:
                 reasons.append("ANOMALOUS_KEYSTROKE_PATTERN")
             if payload.context_sig < 0.6:
