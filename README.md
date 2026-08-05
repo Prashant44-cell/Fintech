@@ -174,5 +174,4 @@ python test_api.py
 - **P95 Transaction Finality**: `84 ms`
 - **False Acceptance Rate (FAR)**: `< 0.12%`
 - **False Rejection Rate (FRR)**: `< 0.31%`
-- **IBFT 2.0 Consensus Throughput**: `3,450 TPS`#   F i n t e c h  
- 
+- **IBFT 2.0 Consensus Throughput**: `3,450 TPS`#
