@@ -19,7 +19,7 @@ export default function AuthModal({ onAuthSuccess }) {
   const [mode, setMode] = useState('login');
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({
-    username: 'aarav_sharma', password: 'password123',
+    username: '', password: '',
     full_name: '', email: '', institution: 'Nexus Global Reserve Bank', department: 'Private Wealth & Digital Vault',
   });
   const [busy, setBusy] = useState(false);
